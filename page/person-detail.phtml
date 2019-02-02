@@ -1,0 +1,119 @@
+<?php
+
+//~ Template for person-detail.php
+// variables:
+//  $person - Person to be displayed
+
+/* @var $person Person */
+?>
+
+<table class="detail">
+    <tr>
+        <th>Name</th>
+        <td>
+            <a href="<?php echo Utils::createLink('add-edit-person', array('id' => $person->getId())) ?>">
+            <?php echo Utils::escape($person->getFirstName() . ' ' . $person->getLastName()); ?>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <th>Unit</th>
+        <td><?php echo Utils::escape($person->getUnit()); ?></td>
+    </tr>
+    <tr>
+        <th>Email</th>
+        <td><?php echo Utils::escape($person->getEmail()); ?></td>
+    </tr>
+    <tr>
+        <th>Phone1</th>
+        <td><?php echo Utils::escape($person->getPhone1()); ?></td>
+    </tr>
+    <tr>
+        <th>Phone2</th>
+        <td><?php echo Utils::escape($person->getPhone2()); ?></td>
+    </tr>
+    <tr>
+        <th>Phone3</th>
+        <td><?php echo Utils::escape($person->getPhone3()); ?></td>
+    </tr>
+    <?php if ( count( $person->getUnits()) == 1 ): ?>
+    <tr>
+        <th>Unit</th>
+        <td><?php echo Utils::escape($person->getUnit() ); ?></td>
+    <?php endif; ?>
+    </tr>
+    
+</table>
+
+<?php if (count( $person->getNames()) > 1): ?>
+    <h3>Names</h3>
+    <table class="detail">    
+        <tr>
+            <th>First</th>
+            <th>Last</th>
+            <th>Start</th>
+            <th>End</th>
+        </tr>
+        <?php foreach( $person->getNames() as $person_name ) : ?>
+        <tr>
+            <td>
+                <a href="<?php echo Utils::createLink('add-edit-person-name', array('id' => $person_name->getId(), 'person_id' => $person->getId())) ?>">
+                <?php echo Utils::escape($person_name->getFirstName()); ?>
+                </a>
+            </td>
+            <td>
+                <a href="<?php echo Utils::createLink('add-edit-person-name', array('id' => $person_name->getId(), 'person_id' => $person->getId())) ?>">
+                <?php echo Utils::escape($person_name->getLastName()); ?>
+                </a>
+            </td>
+            <td>
+                <?php echo Utils::escape(Utils::formatDate($person_name->getStartDate())) ?>
+            </td>
+            <td>
+                <?php echo Utils::escape(Utils::formatDate($person_name->getEndDate())) ?>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+ 
+<?php if (count( $person->getUnits()) > 1): ?>
+    <h3>Units</h3>
+    <table class="detail">    
+        <tr>
+            <th>Unit</th>
+            <th>Type</th>
+            <th>Start</th>
+            <th>End</th>
+        </tr>
+        <?php foreach( $person->getUnits() as $unit_person ) : ?>
+            <tr>
+                <td>
+                    <a href="<?php echo Utils::createLink('add-edit-unit-person', array('id' => $unit_person->getId(), 'person_id' => $person->getId())) ?>">
+                    <?php echo Utils::escape($unit_person->getUnitId()); ?>
+                    </a>
+                </td>
+                <td>
+                    <?php echo Utils::escape($unit_person->getOccupantType()); ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape(Utils::formatDate($unit_person->getStartDate())) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape(Utils::formatDate($unit_person->getEndDate())) ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php else: ?>
+<?php endif; ?>
+
+<div class="actions">
+    <a href="<?php echo Utils::createLink('add-edit-person', array('id' => $person->getId())); ?>"><img src="img/action/edit.png" alt="" title="Edit it." class="icon" /></a>
+</div>
+
+<p>
+    <?php $backLink = Utils::createLink('unit-list', array()); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a href="<?php echo $backLink; ?>">To the list</a>
+</p>

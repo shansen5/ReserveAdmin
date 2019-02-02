@@ -1,0 +1,156 @@
+<?php
+
+
+//~ Template for add-edit-unit-person.php
+// variables:
+//  $errors - validation errors
+//  $person - submitted Order
+//  $edit - true for EDIT, false for ADD
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error RError */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+/* @var $person_name UnitPerson */
+?>
+
+<h1>
+    <?php if ($edit): ?>
+        <?php 
+        echo "Edit Unit for Person: " . Utils::escape( $person->getFirstName() )
+                . ' ' . Utils::escape( $person->getLastName() ); 
+        ?>
+    <?php else: ?>
+        <?php 
+        echo "Add Unit for Person: " . Utils::escape( $person->getFirstName() )
+                . ' ' . Utils::escape( $person->getLastName() ); 
+        ?>
+    <?php endif; ?>
+</h1>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error RError */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<div class="actions">
+    <a href="<?php echo Utils::createLink('unit-person-delete', array('id' => $unit_person->getId())); ?>" id="delete-link"><img src="img/action/delete.png" alt="" title="Delete it." class="icon" /></a>
+</div>
+<div id="delete-dialog" title="Delete this Unit-Person record?">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This record will be deleted. Are you sure?</p>
+</div>
+
+<form action="#" method="post">
+    <fieldset>
+        <?php if ($edit): ?>
+            <div  class="field">
+                <label>Unit:</label>
+                <select name="unit_person[unit]">
+                    <?php 
+                        foreach (range( 1, Utils::getNumberOfUnits()) as $id) {
+                            $unit_option = "<option value='" . $id . "'";
+                            if ( $unit_person->getUnitId() === $id ) {
+                                $unit_option .= " selected ";
+                            }
+                            $unit_option .= ">" . $id . "</option>";
+                            echo $unit_option;
+                        }
+                    ?>
+                </select>
+            </div>
+            <div class="field">
+                <p>The date the person moved into this unit.</p>
+            </div>
+            <div class="field">
+                <label>Unit Start:</label>
+                <input type="date" name="unit_person[start_date]" 
+                       value="<?php echo $unit_person->getStartDate()->format('Y-m-d'); ?>"/> 
+            </div>
+            <div class="field">
+                <p>The date the person moved out of this unit.</p>
+            </div>
+            <div class="field">
+                <label>Unit End:</label>
+                <input type="date" name="unit_person[end_date]" 
+                       value="<?php echo $unit_person->getEndDate() ? $unit_person->getEndDate()->format('Y-m-d') : null; ?>"/> 
+            </div>
+            <div class='field'>
+                <label>Occupant Type</label>
+                <select name="unit_person[occupant_type]">
+                    <?php 
+                        $up_class = 'UnitPerson';
+                        foreach( $up_class::getOccupantTypes() as $up_type ) {
+                            $occupant_type = "<option value='";
+                            $occupant_type .= $up_type . "'";
+                            if ( $unit_person->getOccupantType() === $up_type ) {
+                                $occupant_type .= " selected ";
+                            }
+                            $occupant_type .= ">" . $up_type . "</option>";
+                            echo $occupant_type;
+                        }
+                    ?>
+                </select>
+            </div>
+           
+        <?php else: ?>
+            <div  class="field">
+                <label>Unit:</label>
+                <select name="unit_person[unit]">
+                    <?php foreach (range( 1, Utils::getNumberOfUnits()) as $id): ?>
+                        <option value="<?php echo Utils::escape($id); ?>"
+                                ><?php echo Utils::escape($id); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="field">
+                <p>The date the person moved into this unit.</p>
+            </div>
+            <div class="field">
+                <label>Unit Start:</label>
+                <input type="date" name="unit_person[start_date]" /> 
+            </div>
+            <div class="field">
+                <p>The date the person moved out of this unit.</p>
+            </div>
+            <div class="field">
+                <label>Unit End:</label>
+                <input type="date" name="unit_person[end_date]" /> 
+            </div>
+            <div class='field'>
+                <label>Occupant Type</label>
+                <select name="unit_person[occupant_type]">
+                    <?php 
+                        $up_class = 'UnitPerson';
+                        foreach( $up_class::getOccupantTypes() as $up_type ) {
+                            $occupant_type = "<option value='";
+                            $occupant_type .= $up_type;
+                            $occupant_type .= "'>" . $up_type . "</option>";
+                            echo $occupant_type;
+                        }
+                    ?>
+                </select>
+            </div>
+        <?php endif; ?>
+        <div class="wrapper">
+            <input type="submit" name="cancel" value="CANCEL" class="submit" />
+            <input type="submit" name="save" value="<?php echo $edit ? 'EDIT' : 'ADD'; ?>" class="submit" />
+        </div>
+    </fieldset>
+</form>
+
+<p>
+    <?php $backLink = Utils::createLink('person-detail', array('id' => $person->getId())); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the person." class="icon"/></a>&nbsp;
+    <a href="<?php echo $backLink; ?>">To the person</a>
+</p>

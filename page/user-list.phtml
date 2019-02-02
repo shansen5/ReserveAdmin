@@ -1,0 +1,24 @@
+<?php
+
+
+//~ Template for user-list.php
+// variables:
+//  $title - page title
+//  $users - Items to be displayed
+
+?>
+
+<?php if (empty($users)): ?>
+    <p>No users found.</p>
+<?php else: ?>
+    <ul class="user-list">
+        <?php foreach ($users as $user): ?>
+            <?php /* @var $user Item */ ?>
+            <li>
+                <a href="<?php echo Utils::createLink('add-edit-user', array('id' => $user->getId())) ?>">
+                    <?php echo Utils::escape($user->getUsername()); ?>--<?php echo Utils::escape($user->getRole()); ?>
+                    </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>

@@ -1,0 +1,104 @@
+<?php
+
+
+//~ Template for add-edit-person-name.php
+// variables:
+//  $errors - validation errors
+//  $person - submitted Order
+//  $edit - true for EDIT, false for ADD
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error RError */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+/* @var $person_name PersonName */
+?>
+
+<h1>
+    <?php if ($edit): ?>
+        <?php 
+        echo "Edit Person Name: " . Utils::escape( $person_name->getFirstName() )
+                . ' ' . Utils::escape( $person_name->getLastName() ); 
+        ?>
+    <?php else: ?>
+        Add new Person name
+    <?php endif; ?>
+</h1>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error RError */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<form action="#" method="post">
+    <fieldset>
+        <?php if ($edit): ?>
+            <div  class="field">
+                <label>First Name:</label>
+                <input type="text" name="person_name[first_name]" value="<?php echo Utils::escape($person_name->getFirstName()); ?>"
+                       class="text<?php echo error_field('first_name', $errors); ?>"/>
+            </div>
+            <div  class="field">
+                <label>Last Name:</label>
+                <input type="text" name="person_name[last_name]" value="<?php echo Utils::escape($person_name->getLastName()); ?>"
+                       class="text<?php echo error_field('last_name', $errors); ?>"/>
+            </div>
+            <div class="field">
+                <p>(E.g. the birth date, or the date of a name change.)</p>
+            </div>
+            <div class="field">
+                <label>Name Start:</label>
+                <input type="date" name="person_name[start_date]" 
+                   value='<?php echo $person_name->getStartDate()->format('Y-m-d'); ?>'/> 
+            </div>
+            <div class="field">
+                <label>Name End:</label>
+                <input type="date" name="person_name[end_date]" 
+                   value='<?php echo $person_name->getEndDate() ? $person_name->getEndDate()->format('Y-m-d') : null; ?>'/> 
+            </div>
+           
+        <?php else: ?>
+            <div  class="field">
+                <label>First Name:</label>
+                <input type="text" name="person_name[first_name]" value="<?php echo Utils::escape($person_name->getFirstName()); ?>"
+                       class="text<?php echo error_field('first_name', $errors); ?>"/>
+            </div>
+            <div  class="field">
+                <label>Last Name:</label>
+                <input type="text" name="person_name[last_name]" value="<?php echo Utils::escape($person_name->getLastName()); ?>"
+                       class="text<?php echo error_field('last_name', $errors); ?>"/>
+            </div>
+            <div class="field">
+                <p>(E.g. the birth date, or the date of a name change.)</p>
+            </div>
+            <div class="field">
+                <label>Name Start:</label>
+                <input type="date" name="person_name[start_date]" /> 
+            </div>
+            <div class="field">
+                <label>Name End:</label>
+                <input type="date" name="person_name[end_date]" /> 
+            </div>
+        <?php endif; ?>
+        <div class="wrapper">
+            <input type="submit" name="cancel" value="CANCEL" class="submit" />
+            <input type="submit" name="save" value="<?php echo $edit ? 'EDIT' : 'ADD'; ?>" class="submit" />
+        </div>
+    </fieldset>
+</form>
+
+<p>
+    <?php $backLink = Utils::createLink('person-detail', array('id' => $person->getId())); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the person." class="icon"/></a>&nbsp;
+    <a href="<?php echo $backLink; ?>">To the person</a>
+</p>

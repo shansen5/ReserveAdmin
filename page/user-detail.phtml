@@ -1,0 +1,60 @@
+<?php
+
+//~ Template for user-detail.php
+// variables:
+//  $user - Item to be displayed
+
+/* @var $user Item */
+?>
+
+<h1>
+    <?php 
+    echo Utils::escape($user->getUsername()); 
+    ?>
+</h1>
+
+<table class="detail">
+    <tr>
+        <th>Actions</th>
+        <td>
+            <div class="actions">
+                <a href="<?php 
+                echo Utils::createLink('add-edit-user', array('id' => $user->getId())); 
+                ?>"><img src="img/action/edit.png" alt="" title="Edit it." class="icon" /></a>
+                <a href="<?php 
+                echo Utils::createLink('user-delete', array('id' => $user->getId())); 
+                ?>" id="delete-link"><img src="img/action/delete.png" alt="" title="Delete it." class="icon" /></a>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <th>Role</th>
+        <td><?php echo Utils::escape($user->getRole()); ?></td>
+    </tr>
+</table>
+
+<p>
+    <?php 
+    $backLink = Utils::createLink('user-list', array()); 
+    ?>
+    <a href="<?php 
+    echo $backLink; 
+    ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a href="<?php 
+    echo $backLink; 
+    ?>">To the list</a>
+</p>
+
+<div id="delete-dialog" title="Delete this Item?">
+    <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This Item will be deleted. Are you sure?</p>
+</div>
+<div id="change-status-dialog">
+    <form id="change-status-form" method="post">
+        <fieldset>
+            <div class="field">
+                <label>Comment:</label>
+                <textarea name="comment" cols="1" rows="1"></textarea>
+            </div>
+        </fieldset>
+    </form>
+</div>

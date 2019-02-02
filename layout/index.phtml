@@ -1,0 +1,84 @@
+<?php
+
+
+//~ Template for index.php
+// variables:
+//  $template - page to be displayed (included)
+//  $flashes - flash messages
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>BellCoho Unit/People/Reservations</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <meta name="description" content="BellCoho Unit/People/Reservations" />
+    <meta name="keywords" content="Bellingham Cohousing People" />
+    <meta name="author" content="Steve" />
+
+    <link type="text/css" href="css/redmond/jquery-ui-1.8.16.custom.css" rel="stylesheet" />
+    <link href="css/style.css?version=1" rel="stylesheet" type="text/css" />
+    <link href="css/layout.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+
+</head>
+<body id="page">
+    <div class="tail-top-right"></div>
+    <div id="main">
+        <!-- header -->
+        <div id="header"></div>
+        <!-- content -->
+        <div id="content">
+            <div class="wrapper">
+                <div class="col-1">
+                    <div class="box">
+                        <div class="inner">
+                            <ul class="list">
+                                <li><span><a href="<?php echo Utils::createLink('home'); ?>">Home</a></span></li>
+                                <li><span><a href="<?php echo Utils::createLink('unit-list'); ?>"
+                                             ><img src="img/status/DONE.png" alt="" title="Units" class="icon" />Units</a></span></li>
+                                <li><span><a href="<?php echo Utils::createLink('person-list'); ?>"
+                                             ><img src="img/status/DONE.png" alt="" title="People" class="icon" />People</a></span></li>
+                                <?php 
+                                    $role = Utils::getUserRole();
+                                    if ( $role == Utils::ADMIN ) : ?>
+                                        <li><span><a href="<?php echo Utils::createLink('add-edit-user'); ?>"
+                                                     ><img src="img/action/add.png" alt="" title="Add User" class="icon" />Add User</a></span></li>
+                                        <li class="last"><span><a href="<?php echo Utils::createLink('user-list'); ?>"
+                                                     ><img src="img/status/DONE.png" alt="" title="List Users" class="icon" />List Users</a></span></li>
+                                <?php endif ?>
+                                <li><span><a href="<?php echo Utils::createLink('logout'); ?>"
+                                             ><img src="img/status/DONE.png" alt="" title="Logout" class="icon" />Logout</a></span></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="indent">
+                        <?php if ($flashes): ?>
+                            <ul id="flashes">
+                            <?php foreach ($flashes as $flash): ?>
+                                <li><?php echo $flash; ?></li>
+                            <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+                        <?php require $template; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- footer -->
+        <div id="footer">
+            <div class="indent">
+                <div class="fleft"><a href="https://bellcoho.com">The Bellingham Cohousing Condominium Association</a>, 2017 &copy; Copyright Where's My Brunch, LLC, All rights reserved</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

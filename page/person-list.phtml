@@ -1,0 +1,125 @@
+<?php
+
+
+//~ Template for person-list.php
+// variables:
+//  $title - page title
+//  $items - Locations to be displayed
+
+?>
+
+<table class="detail">
+    <tr>
+        <th>Actions</th>
+        <td>
+            <div class="actions">
+                <a href="<?php 
+                echo Utils::createLink('add-edit-person'); 
+                ?>"><img src="img/action/add.png" alt="" title="Add Person" class="icon" /></a>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<?php
+    $show_date = "Current";
+    if ( isset( $_POST[ 'show_date' ])) {
+        $show_date = $_POST[ 'show_date' ];
+    }
+?>
+<div id="twocolwrapper">
+    <div id="column1">
+        <form action="#" method="post">
+            <fieldset>
+                <div  class="field">
+                    <label>Show people as of:</label>
+                    <select name="show_date">
+                        <option value="Current" 
+                                <?php if ( "Current" == $show_date ): ?>
+                                    selected="selected"
+                                <?php endif; ?>
+                                >Current</option>
+                        <option value="All" 
+                                <?php if ( "All" == $show_date ): ?>
+                                    selected="selected"
+                                <?php endif; ?>
+                                >All</option>
+                        <option value="Selected" 
+                                <?php if ( "Selected" == $show_date ): ?>
+                                    selected="selected"
+                                <?php endif; ?>
+                                >Selected date</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>As of Date:</label>
+                    <input type="date" name="selected_date" 
+                          <?php if ($_POST['selected_date']) echo 'value="' . $_POST['selected_date'] . '" '; ?>
+                           /> 
+                </div>
+                <div  class="field">
+                    <label>Show occupant type:</label>
+                    <select name="occupant_type">
+                        <option value="All" 
+                                <?php if ( "All" == $_POST['occupant_type']): ?>
+                                    selected="selected"
+                                <?php endif; ?>
+                                >All</option>
+                    <?php foreach (Utils::getOccupantTypes() as $type): ?>
+                        <option value="<?php echo $type; ?>"
+                                <?php if ($type == $_POST['occupant_type']): ?>
+                                    selected="selected"
+                                <?php endif; ?>
+                                ><?php echo $type; ?></option>
+                    <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="wrapper">
+                    <input type="submit" name="save" value="FILTER" class="submit" />
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+</div>
+
+<table class="detail">
+    <tr>
+        <th>First</th>
+        <th>Last</th>
+        <th>Unit</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Phone</th>
+        <th>Phone</th>
+    </tr>
+    </th>
+    <?php foreach ($persons as $person): ?>
+        <?php /* @var $person Person */ ?>
+        <tr>
+            <td>
+                <a href="<?php echo Utils::createLink('person-detail', array('id' => $person->getId())) ?>">
+                    <?php echo Utils::escape($person->getFirstName()) ?></a>
+            </td>
+            <td>
+                <a href="<?php echo Utils::createLink('person-detail', array('id' => $person->getId())) ?>">
+                <?php echo Utils::escape($person->getLastName()) ?></a>
+            </td>
+            <td>
+                <?php echo Utils::escape($person->getUnit()) ?>
+            </td>
+            <td>
+                <?php echo Utils::escape($person->getEmail()) ?>
+            </td>
+            <td>
+                <?php echo Utils::escape($person->getPhone1()) ?>
+            </td>
+            <td>
+                <?php echo Utils::escape($person->getPhone2()) ?>
+            </td>
+            <td>
+                <?php echo Utils::escape($person->getPhone3()) ?>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</table>

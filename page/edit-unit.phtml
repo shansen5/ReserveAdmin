@@ -1,0 +1,129 @@
+<?php
+
+
+//~ Template for edit-unit.php
+// variables:
+//  $errors - validation errors
+//  $unit - submitted Item
+//  $edit - true for EDIT, false for ADD
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error Error */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+/* @var $unit Item */
+?>
+
+<br/><br/>
+
+<h1>
+    <?php if ($edit): ?>
+        Unit: <?php echo Utils::escape($unit->getId() . ' - ' . $unit->getType()); ?>
+    <?php else: ?>
+        Add new Item
+    <?php endif; ?>
+</h1>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error Error */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<form action="#" method="post">
+    <fieldset>
+        <div class="field">
+            <label>ID:</label>
+            <input type="number" name="unit[id]" value="<?php echo Utils::escape($unit->getId()); ?>"
+                   class="text<?php echo error_field('id', $errors); ?>" hidden/>
+            <?php echo Utils::escape($unit->getId()); ?>
+        </div>
+        <div class="field">
+            <label>Address:</label>
+            <input type="number" name="unit[address]" value="<?php echo Utils::escape($unit->getAddress()); ?>"
+                   class="text<?php echo error_field('address', $errors); ?>" hidden/>
+            <?php echo Utils::escape($unit->getAddress()); ?>
+        </div>
+        <div class="field">
+            <label>Building:</label>
+            <input type="number" name="unit[building_id]" value="<?php echo Utils::escape($unit->getBuildingId()); ?>"
+                   class="text<?php echo error_field('building', $errors); ?>" hidden/>
+            <?php echo Utils::escape($unit->getBuildingId()); ?>
+        </div>
+        <div class="field">
+            <label>Type:</label>
+            <input type="text" name="unit[type]" value="<?php echo Utils::escape($unit->getType()); ?>"
+                   class="text<?php echo error_field('type', $errors); ?>" hidden/>
+            <?php echo Utils::escape($unit->getType()); ?>
+        </div>
+        <?php 
+            $role = Utils::getUserRole();
+            if ( $role == Utils::ADMIN ) : ?>
+                <div class="field">
+                    <label>Guest Limit:</label>
+                    <input type="number" step="1" min="0" name="unit[guest_limit]" value="<?php echo Utils::escape($unit->getGuestLimit()); ?>"
+                           class="text<?php echo error_field('guest_limit', $errors); ?>"/>
+                </div>
+                <div class="wrapper">
+                    <input type="submit" name="cancel" value="CANCEL" class="submit" />
+                    <input type="submit" name="save" value="<?php echo $edit ? 'UPDATE' : 'ADD'; ?>" class="submit" />
+                </div>
+        <?php endif ?>
+    </fieldset>
+</form>
+
+<?php if (empty($unit_persons)): ?>
+    <p>No occupant history for unit found.</p>
+<?php else: ?>
+    <table class="detail">
+        <tr>
+            <th>First</th> 
+            <th>Last</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Type</th>
+        </tr>
+        <?php foreach ($unit_persons as $unit_person): ?>
+            <tr>
+                <td>
+                    <a href="<?php echo Utils::createLink('person-detail', array('id' => $unit_person->getPersonId())) ?>">
+                        <?php echo $unit_person->getFirstName() ?></a>
+                </td>
+                <td>
+                    <a href="<?php echo Utils::createLink('person-detail', array('id' => $unit_person->getPersonId())) ?>">
+                        <?php echo $unit_person->getLastName() ?></a>
+                </td>
+                <td>
+                    <?php echo Utils::escape(Utils::formatDate($unit_person->getStartDate())) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape(Utils::formatDate($unit_person->getEndDate())) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape($unit_person->getOccupantType()) ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+
+<p>
+    <?php 
+    $backLink = Utils::createLink('unit-list', array()); 
+    ?>
+    <a href="<?php 
+    echo $backLink; 
+    ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a href="<?php 
+    echo $backLink; 
+    ?>">To the list</a>
+</p>

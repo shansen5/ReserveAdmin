@@ -1,0 +1,19 @@
+#Prevent folder browsing
+# For security reasons, Option all cannot be overridden.
+#Options All -Indexes
+Options ExecCGI Includes IncludesNOEXEC SymLinksIfOwnerMatch -Indexes
+#Options ExecCGI Includes IncludesNOEXEC SymLinksIfOwnerMatch -Indexes
+
+# Use PHP5.4 Single php.ini as default
+AddHandler application/x-httpd-php54s .php
+
+<files ~ "^.*\.([Hh][Tt][Aa])">
+order allow,deny
+deny from all
+satisfy all
+</files>
+
+<files config/config.ini>
+order allow,deny
+deny from all
+</files>

@@ -1,0 +1,231 @@
+<?php
+
+
+//~ Template for add-edit-person.php
+// variables:
+//  $errors - validation errors
+//  $person - submitted Order
+//  $edit - true for EDIT, false for ADD
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error RError */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+/* @var $person Person */
+?>
+
+<h1>
+    <?php if ($edit): ?>
+        <?php 
+        echo "Edit Person: " . Utils::escape( $person->getFirstName() )
+                . ' ' . Utils::escape( $person->getLastName() ); 
+        ?>
+    <?php else: ?>
+        Add new Person
+    <?php endif; ?>
+</h1>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error RError */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<form action="#" method="post">
+    <fieldset>
+        <?php if ($edit): ?>
+            <?php if ( count( $person->getNames() ) > 1 ) : ?>
+                <div  class="field">
+                    <label>Name:</label>
+                    <table class="detail">    
+                        <tr>
+                            <th>First</th>
+                            <th>Last</th>
+                            <th>Start</th>
+                            <th>End</th>
+                        </tr>
+                        <?php foreach( $person->getNames() as $person_name ) : ?>
+                            <tr>
+                                <td>
+                                    <a href="<?php echo Utils::createLink('add-edit-person-name', array('id' => $person_name->getId(), 'person_id' => $person->getId())) ?>">
+                                    <?php echo Utils::escape($person_name->getFirstName()); ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="<?php echo Utils::createLink('add-edit-person-name', array('id' => $person_name->getId(), 'person_id' => $person->getId())) ?>">
+                                    <?php echo Utils::escape($person_name->getLastName()); ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <?php echo Utils::escape(Utils::formatDate($person_name->getStartDate())) ?>
+                                </td>
+                                <td>
+                                    <?php echo Utils::escape(Utils::formatDate($person_name->getEndDate())) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                </div>
+            <?php else: ?>
+                <div  class="field">
+                    <label>First Name:</label>
+                    <input type="text" name="person[first_name]" value="<?php echo Utils::escape($person->getFirstName()); ?>"
+                           class="text<?php echo error_field('first_name', $errors); ?>"/>
+                </div>
+                <div  class="field">
+                    <label>Last Name:</label>
+                    <input type="text" name="person[last_name]" value="<?php echo Utils::escape($person->getLastName()); ?>"
+                           class="text<?php echo error_field('last_name', $errors); ?>"/>
+                </div>
+                <div class="field">
+                    <p>(E.g. the birth date, or the date of a name change.)</p>
+                </div>
+                <div class="field">
+                    <label>Name Start Date:</label>
+                    <input type="date" name="person[name_start_date]" 
+                       value='<?php echo $start_date_string; ?>'/> 
+                </div>
+            <?php endif; ?>
+            <div class="field">
+                <label>Add name</label>
+                <div class="actions">
+                    <a href="<?php 
+                    echo Utils::createLink('add-edit-person-name', array('person_id' => $person->getId())); 
+                    ?>"><img src="img/action/add.png" alt="" title="Add Name" class="icon" /></a>
+                </div>
+            </div>
+           
+        <?php else: ?>
+            <div  class="field">
+                <label>First Name:</label>
+                <input type="text" name="person[first_name]" value="<?php echo Utils::escape($person->getFirstName()); ?>"
+                       class="text<?php echo error_field('first_name', $errors); ?>"/>
+            </div>
+            <div  class="field">
+                <label>Last Name:</label>
+                <input type="text" name="person[last_name]" value="<?php echo Utils::escape($person->getLastName()); ?>"
+                       class="text<?php echo error_field('last_name', $errors); ?>"/>
+            </div>
+                <div class="field">
+                    <p>(E.g. the birth date, or the date of a name change.)</p>
+                </div>
+                <div class="field">
+                    <label>Name Start Date:</label>
+                    <input type="date" name="person[name_start_date]" /> 
+                </div>
+        <?php endif; ?>
+        <div class="field">
+            <label>Password:</label>
+            <input type="password" name="person[password]" value="<?php echo Utils::escape($person->getPassword()); ?>"
+                   class="text<?php echo error_field('password', $errors); ?>"/>
+        </div>
+        <div  class="field">
+            <label>Email:</label>
+            <input type="text" name="person[email]" value="<?php echo Utils::escape($person->getEmail()); ?>"
+                   class="text<?php echo error_field('email', $errors); ?>"/>
+        </div>
+        <div  class="field">
+            <label>Phone1:</label>
+            <input type="text" name="person[phone1]" value="<?php echo Utils::escape($person->getPhone1()); ?>"
+                   class="text<?php echo error_field('phone1', $errors); ?>"/>
+        </div>
+        <div  class="field">
+            <label>Phone2:</label>
+            <input type="text" name="person[phone2]" value="<?php echo Utils::escape($person->getPhone2()); ?>"
+                   class="text<?php echo error_field('phone2', $errors); ?>"/>
+        </div>
+        <div  class="field">
+            <label>Phone3:</label>
+            <input type="text" name="person[phone3]" value="<?php echo Utils::escape($person->getPhone3()); ?>"
+                   class="text<?php echo error_field('phone3', $errors); ?>"/>
+        </div>
+        <?php if ($edit): ?>
+            <div  class="field">
+                <label>Units:</label>
+                <table class="detail">    
+                    <tr>
+                        <th>Unit</th>
+                        <th>Type</th>
+                        <th>Start</th>
+                        <th>End</th>
+                    </tr>
+                    <?php foreach( $unit_persons as $unit_person ) : ?>
+                        <tr>
+                            <td>
+                                <a href="<?php echo Utils::createLink('add-edit-unit-person', array('id' => $unit_person->getId(), 'person_id' => $person->getId())) ?>">
+                                <?php echo Utils::escape($unit_person->getUnitId()); ?>
+                                </a>
+                            </td>
+                            <td>
+                                <?php echo Utils::escape($unit_person->getOccupantType()); ?>
+                            </td>
+                            <td>
+                                <?php echo Utils::escape(Utils::formatDate($unit_person->getStartDate())) ?>
+                            </td>
+                            <td>
+                                <?php echo Utils::escape(Utils::formatDate($unit_person->getEndDate())) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </div>
+        <?php else: ?>
+            <div  class="field">
+                <label>Unit:</label>
+                <select name="person[unit_id]">
+                    <?php foreach (range( 1, Utils::getNumberOfUnits()) as $id): ?>
+                        <option value="<?php echo Utils::escape($id); ?>"
+                                ><?php echo Utils::escape($id); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <p>The date the person moved into this unit.</p>
+            </div>
+            <div class="field">
+                <label>Unit Start Date:</label>
+                <input type="date" name="person[unit_start_date]" /> 
+            </div>
+            <div class='field'>
+                <label>Occupant Type</label>
+                <select name="person[occupant_type]">
+                    <?php 
+                        $up_class = 'UnitPerson';
+                        foreach( $up_class::getOccupantTypes() as $up_type ) {
+                            echo "<option value='";
+                            echo $up_type . "'>" . $up_type . "</option>";
+                        }
+                    ?>
+                </select>
+            </div>
+        <?php endif; ?>
+            <div class="field">
+                <label>Add unit</label>
+                <div class="actions">
+                    <a href="<?php 
+                    echo Utils::createLink('add-edit-unit-person', array('person_id' => $person->getId())); 
+                    ?>"><img src="img/action/add.png" alt="" title="Add Unit" class="icon" /></a>
+                </div>
+            </div>
+        <div class="wrapper">
+            <input type="submit" name="cancel" value="CANCEL" class="submit" />
+            <input type="submit" name="save" value="<?php echo $edit ? 'EDIT' : 'ADD'; ?>" class="submit" />
+        </div>
+    </fieldset>
+</form>
+
+<p>
+    <?php $backLink = Utils::createLink('person-list', array()); ?>
+    <a href="<?php echo $backLink; ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a href="<?php echo $backLink; ?>">To the list</a>
+</p>
+

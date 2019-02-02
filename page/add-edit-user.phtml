@@ -1,0 +1,90 @@
+<?php
+
+
+//~ Template for add-edit-user.php
+// variables:
+//  $errors - validation errors
+//  $user - submitted Item
+//  $edit - true for EDIT, false for ADD
+
+function error_field($title, array $errors) {
+    foreach ($errors as $error) {
+        /* @var $error Error */
+        if ($error->getSource() == $title) {
+            return ' error-field';
+        }
+    }
+    return '';
+}
+
+/* @var $user Item */
+?>
+
+<?php if ($edit): ?>
+    <div class="actions">
+        <a href="<?php echo Utils::createLink('add-edit-user', array('id' => $user->getId(), 'clone' => true)); ?>"><img src="img/action/clone.png" alt="" title="Clone it." class="icon" /></a>
+        <a href="<?php echo Utils::createLink('user-delete', array('id' => $user->getId())); ?>" id="delete-link"><img src="img/action/delete.png" alt="" title="Delete it." class="icon" /></a>
+    </div>
+    <div id="delete-dialog" title="Terminate this Order?">
+        <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>This Order will be deleted. Are you sure?</p>
+    </div>
+<?php endif; ?>
+<br/><br/>
+
+<h1>
+    <?php if ($edit): ?>
+        <?php echo Utils::escape($user->getUsername()); ?>
+    <?php else: ?>
+        Add new Item
+    <?php endif; ?>
+</h1>
+
+<?php if (!empty($errors)): ?>
+<ul class="errors">
+    <?php foreach ($errors as $error): ?>
+        <?php /* @var $error Error */ ?>
+        <li><?php echo $error->getMessage(); ?></li>
+    <?php endforeach; ?>
+</ul>
+<?php endif; ?>
+
+<form action="#" method="post">
+    <fieldset>
+        <div class="field">
+            <label>User:</label>
+            <input type="text" name="user[username]" value="<?php echo Utils::escape($user->getUsername()); ?>"
+                   class="text<?php echo error_field('username', $errors); ?>"/>
+        </div>
+        <div class="field">
+            <label>Password:</label>
+            <input type="password" name="user[password]" value="<?php echo Utils::escape($user->getPassword()); ?>"
+                   class="text<?php echo error_field('password', $errors); ?>"/>
+        </div>
+        <div  class="field">
+            <label>Role:</label>
+            <select name="user[role]">
+                <option value="USER" <?php if ("USER" == $user->getRole()): ?>
+                            selected="selected" <?php endif; ?>
+                            >USER</option>
+                <option value="ADMIN" <?php if ("ADMIN" == $user->getRole()): ?>
+                            selected="selected" <?php endif; ?>
+                            >ADMIN</option>
+            </select>
+        </div>
+        <div class="wrapper">
+            <input type="submit" name="cancel" value="CANCEL" class="submit" />
+            <input type="submit" name="save" value="<?php echo $edit ? 'EDIT' : 'ADD'; ?>" class="submit" />
+        </div>
+    </fieldset>
+</form>
+<p>
+    <?php 
+    $backLink = Utils::createLink('user-list', array()); 
+    ?>
+    <a href="<?php 
+    echo $backLink; 
+    ?>"><img src="img/action/back.png" alt="" title="Back to the list." class="icon"/></a>&nbsp;
+    <a href="<?php 
+    echo $backLink; 
+    ?>">To the list</a>
+</p>

@@ -1,0 +1,47 @@
+<?php
+
+
+//~ Template for unit-list.php
+// variables:
+//  $title - page title
+//  $items - Units to be displayed
+
+?>
+
+<?php if (empty($units)): ?>
+    <p>No units found.</p>
+<?php else: ?>
+    <table class="detail">
+        <tr>
+            <th>Unit</th>
+            <th>Address</th>
+            <th>Building</th>
+            <th>Type</th>
+            <th>Guest Limit</th>
+        </tr>
+        </th>
+        <?php foreach ($units as $unit): ?>
+            <?php /* @var $unit Unit */ ?>
+            <tr>
+                <td>
+                    <a href="<?php echo Utils::createLink('edit-unit', array('id' => $unit->getId())) ?>">
+                    <?php echo Utils::escape($unit->getId()); ?>
+                    </a>
+                </td>
+                <td>
+                    <?php echo Utils::escape($unit->getAddress()) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape($unit->getBuildingId()) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape($unit->getType()) ?>
+                </td>
+                <td>
+                    <?php echo Utils::escape($unit->getGuestLimit()) ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+<?php endif; ?>
+
