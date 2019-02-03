@@ -1,7 +1,7 @@
 <?php
 $message="";
 if(count($_POST)>0) {
-  $conn = mysql_connect("localhost","root","Seh0531");
+  $conn = mysql_connect("localhost","user","abcdefg");
   mysql_select_db("oc_orders",$conn);
   $result = mysql_query("SELECT * FROM users WHERE username='" . $_POST["username"] . "' and password = '". $_POST["password"]."'");
   $count  = mysql_num_rows($result);
