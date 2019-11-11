@@ -33,7 +33,8 @@ final class Unit {
     }
 
     public static function allUnitTypes() {
-        return $this->unit_types;
+        $unit = new Unit();
+        return $unit->unit_types;
     }
 
     //~ Getters & setters

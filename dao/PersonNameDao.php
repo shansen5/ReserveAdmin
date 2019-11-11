@@ -194,8 +194,8 @@ final class PersonNameDao {
             ':person_id' => $person_name->getPersonId(),
             ':first_name' => $person_name->getFirstName(),
             ':last_name' => $person_name->getLastName(),
-            ':start_date' => $person_name->getStartDate()->format(DateTime::ISO8601),
-            ':end_date' => $person_name->getEndDate() === null ? null : $person_name->getEndDate()->format(DateTime::ISO8601)
+            ':start_date' => $person_name->getStartDate()->format( 'Y-m-d' ),
+            ':end_date' => $person_name->getEndDate() === null ? null : $person_name->getEndDate()->format( 'Y-m-d' )
         );
         if ( $update ) {
             $params[ ':id'] = $person_name->getId();

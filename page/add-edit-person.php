@@ -39,7 +39,8 @@ if (array_key_exists('cancel', $_POST)) {
         'email' => $_POST['person']['email'],
         'phone1' => $_POST['person']['phone1'],
         'phone2' => $_POST['person']['phone2'],
-        'phone3' => $_POST['person']['phone3']
+        'phone3' => $_POST['person']['phone3'],
+        'birthdate' => $_POST['person']['birthdate']
         );
     $name_data = array(
         'first_name' => $_POST['person']['first_name'],

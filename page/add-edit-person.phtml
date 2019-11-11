@@ -86,6 +86,11 @@ function error_field($title, array $errors) {
                     <input type="text" name="person[last_name]" value="<?php echo Utils::escape($person->getLastName()); ?>"
                            class="text<?php echo error_field('last_name', $errors); ?>"/>
                 </div>
+                <div  class="field">
+                    <label>Birthdate:</label>
+                    <input type="date" name="person[birthdate]" value="<?php echo Utils::escape($person->getBirthdate()); ?>"
+                           class="text<?php echo error_field('birthdate', $errors); ?>"/>
+                </div>
                 <div class="field">
                     <p>(E.g. the birth date, or the date of a name change.)</p>
                 </div>
@@ -115,13 +120,18 @@ function error_field($title, array $errors) {
                 <input type="text" name="person[last_name]" value="<?php echo Utils::escape($person->getLastName()); ?>"
                        class="text<?php echo error_field('last_name', $errors); ?>"/>
             </div>
-                <div class="field">
-                    <p>(E.g. the birth date, or the date of a name change.)</p>
-                </div>
-                <div class="field">
-                    <label>Name Start Date:</label>
-                    <input type="date" name="person[name_start_date]" /> 
-                </div>
+            <div  class="field">
+                <label>Birthdate:</label>
+                <input type="date" name="person[birthdate]" value="<?php echo Utils::escape($person->getBirthdate()->format( 'Y-m-d' )); ?>"
+                       class="text<?php echo error_field('birthdate', $errors); ?>"/>
+            </div>
+            <div class="field">
+                <p>(E.g. the birth date, or the date of a name change.)</p>
+            </div>
+            <div class="field">
+                <label>Name Start Date:</label>
+                <input type="date" name="person[name_start_date]" /> 
+            </div>
         <?php endif; ?>
         <div class="field">
             <label>Password:</label>
@@ -172,7 +182,18 @@ function error_field($title, array $errors) {
                                 <?php echo Utils::escape(Utils::formatDate($unit_person->getStartDate())) ?>
                             </td>
                             <td>
-                                <?php echo Utils::escape(Utils::formatDate($unit_person->getEndDate())) ?>
+                                <?php 
+                                    if ( $unit_person->getEndDate() ) {
+                                        echo Utils::escape(Utils::formatDate($unit_person->getEndDate()));
+                                    } else {
+                                        echo '<input type="hidden" name="person[unit_id]" value=';
+                                        echo $unit_person->getUnitId() . '/>';
+                                        echo '<input type="hidden" name="person[unit_start_date]" value=';
+                                        echo $unit_person->getStartDate()->format( 'Y-m-d' ) . '/>';
+                                        echo '<input type="hidden" name="person[occupant_type]" value=';
+                                        echo $unit_person->getOccupantType() . '/>';
+                                    } 
+                                ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

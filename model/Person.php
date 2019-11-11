@@ -23,6 +23,7 @@ final class Person {
     private $first_name;
     private $last_name;
     private $unit;
+    private $birthdate;
 
 
     /**
@@ -116,6 +117,17 @@ final class Person {
 
     public function setPhone3($phone3) {
         $this->phone3 = $phone3;
+    }
+    
+    /**
+     * @return DateTime <i>null</i> if not persistent
+     */
+    public function getBirthdate() {
+        return $this->birthdate;
+    }
+
+    public function setBirthdate($birthdate) {
+        $this->birthdate = $birthdate;
     }
     
     public function setCurrentNameAndUnit() {

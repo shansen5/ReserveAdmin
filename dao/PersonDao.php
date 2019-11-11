@@ -80,13 +80,12 @@ final class PersonDao {
      */
     public function findById($id) {
         $row = $this->query(
-                'SELECT id, password, email, phone_land as phone1, phone_mobile as phone2, phone_work as phone3 '
+                'SELECT id, password, email, phone_land as phone1, phone_mobile as phone2, phone_work as phone3, birthdate '
                     . ' FROM people u WHERE id = ' . (int) $id)->fetch();
         if (!$row) {
             return null;
         }
         $person = new Person();
-        echo 'DB queery returned row: ' . $row->email;
         PersonMapper::map($person, $row);
         $person_names = $this->getNames( $person->getId() );
         $unit_persons = $this->getUnits( $person->getId() );
@@ -155,7 +154,7 @@ final class PersonDao {
 
     private function getFindSql(PersonSearchCriteria $search = null) {
         $sql = 'SELECT p.id as id, p.password as password, p.email as email, '
-                . 'p.phone_land as phone1, p.phone_mobile as phone2, p.phone_work as phone3,'
+                . 'p.phone_land as phone1, p.phone_mobile as phone2, p.phone_work as phone3, p.birthdate, '
                 . ' pn.first_name as first_name, pn.last_name as last_name, pu.unit_id as unit_id,'
                 . ' pu.type as occupant_type'
                 . ' FROM people p JOIN person_names pn JOIN person_units pu '
@@ -193,8 +192,8 @@ final class PersonDao {
     private function insert(Person $person) {
         $person->setId( null );
         $sql = '
-            INSERT INTO people (id, password, email, phone_land, phone_mobile, phone_work)
-                VALUES (:id, :password, :email, :phone1, :phone2, :phone3)';
+            INSERT INTO people (id, password, email, phone_land, phone_mobile, phone_work, birthdate )
+                VALUES (:id, :password, :email, :phone1, :phone2, :phone3, :birthdate)';
         return $this->execute($sql, $person);
     }
 
@@ -209,7 +208,8 @@ final class PersonDao {
                 email = :email,
                 phone_land = :phone1,
                 phone_mobile = :phone2,
-                phone_work = :phone3
+                phone_work = :phone3,
+                birthdate = :birthdate
             WHERE
                 id = :id';
         return $this->execute($sql, $person);
@@ -235,7 +235,8 @@ final class PersonDao {
             ':email' => $person->getEmail(),
             ':phone1' => $person->getPhone1(),
             ':phone2' => $person->getPhone2(),
-            ':phone3' => $person->getPhone3()
+            ':phone3' => $person->getPhone3(),
+            ':birthdate' => $person->getBirthdate()
         );
         return $params;
     }
