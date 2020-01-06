@@ -69,6 +69,11 @@ function error_field($title, array $errors) {
                 </select>
             </div>
             <div class="field">
+                <label>Sub-unit:</label>
+                <input name="unit_person[sub_unit]" size="3"
+                        value="<?php echo $unit_person->getSubUnit(); ?>" />
+            </div>
+            <div class="field">
                 <p>The date the person moved into this unit.</p>
             </div>
             <div class="field">
@@ -111,6 +116,11 @@ function error_field($title, array $errors) {
                                 ><?php echo Utils::escape($id); ?></option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+            <div class="field">
+                <label>Sub-unit:</label>
+                <input name="unit_person[sub_unit]" size="3"
+                        value="<?php echo $unit_person->getSubUnit(); ?>" />
             </div>
 
             <div class="field">

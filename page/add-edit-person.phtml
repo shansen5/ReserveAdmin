@@ -122,8 +122,13 @@ function error_field($title, array $errors) {
             </div>
             <div  class="field">
                 <label>Birthdate:</label>
-                <input type="date" name="person[birthdate]" value="<?php echo Utils::escape($person->getBirthdate()->format( 'Y-m-d' )); ?>"
-                       class="text<?php echo error_field('birthdate', $errors); ?>"/>
+                <input type="date" name="person[birthdate]" value="
+                    <?php 
+                        if ( $person && $person->getBirthdate() ) {
+                            echo Utils::escape($person->getBirthdate()->format( 'Y-m-d' ));
+                        }
+                    ?>
+                    class="text<?php echo error_field('birthdate', $errors); ?>"/>
             </div>
             <div class="field">
                 <p>(E.g. the birth date, or the date of a name change.)</p>
@@ -187,7 +192,7 @@ function error_field($title, array $errors) {
                                         echo Utils::escape(Utils::formatDate($unit_person->getEndDate()));
                                     } else {
                                         echo '<input type="hidden" name="person[unit_id]" value=';
-                                        echo $unit_person->getUnitId() . '/>';
+                                        echo $unit_person->getUnitId() . $unit_person->getSubUnit() . '/>';
                                         echo '<input type="hidden" name="person[unit_start_date]" value=';
                                         echo $unit_person->getStartDate()->format( 'Y-m-d' ) . '/>';
                                         echo '<input type="hidden" name="person[occupant_type]" value=';
@@ -209,7 +214,11 @@ function error_field($title, array $errors) {
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div class="field">
+                <label>Unit Sub-unit:</label>
+                <input size="3" name="person[sub_unit]" />
+            </div>
+            <div class="field">
                 <p>The date the person moved into this unit.</p>
             </div>
             <div class="field">

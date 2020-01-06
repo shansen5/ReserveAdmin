@@ -1,33 +1,34 @@
 <?php
-require_once( 'AbstractSearchCriteria.php' );
+
 
 /**
- * Search criteria for {@link PersonNameDao}.
+ * Search criteria for {@link PersonDao}.
  * <p>
- * Can be easily extended without changing the {@link PersonNameDao} API.
+ * Can be easily extended without changing the {@link PersonDao} API.
  */
-final class PersonNameSearchCriteria extends AbstractSearchCriteria {
+final class PersonSearchCriteria {
     private $search_date = null;
     private $person_id = null;
     private $first_name = null;
     private $last_name = null;
+    private $occupant_type = null;
+    private $unit_id = null;
+    private $show_all = true;
 
     public function hasFilter() {
-        if ( $this->search_date || $this->person_id || $this->first_name ||
-                $this->last_name ) {
+        if ( $this->search_date || $this->unit_id || $this->person_id
+                || $this->occupant_type ) {
             return true;
         }
         return false;
     }
 
-    public function setPersonSearch( $search ) {
-        if ( $search === NULL ) {
-            return;
-        }
-        $this->setSearchDate( $search->getSearchDate() );
-        $this->setPersonId( $search->getPersonId() );
-        $this->setFirstName( $search->getFirstName() );
-        $this->setLastName( $search->getLastName() );
+    public function setShowAll( $sense ) {
+        $this->show_all = $sense;
+    }
+    
+    public function getShowAll() {
+        return $this->show_all;
     }
     
     public function setSearchDate( $s_date ) {
@@ -46,6 +47,14 @@ final class PersonNameSearchCriteria extends AbstractSearchCriteria {
         return $this->person_id;
     }
 
+    public function setUnitId( $id ) {
+        $this->unit_id = $id;
+    }
+    
+    public function getUnitId() {
+        return $this->unit_id;
+    }
+
     public function setFirstName( $name ) {
         $this->first_name = $name;
     }
@@ -61,4 +70,14 @@ final class PersonNameSearchCriteria extends AbstractSearchCriteria {
     public function getLastName() {
         return $this->last_name;
     }
+
+    public function setOccupantType( $type ) {
+        $this->occupant_type = $type;
+    }
+    
+    public function getOccupantType() {
+        return $this->occupant_type;
+    }
+    
+
 }

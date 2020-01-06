@@ -3,20 +3,40 @@
 /**
  * Model class representing one person_name.
  */
-final class PersonName extends AbstractModel {
+final class PersonName {
 
     /** @var int */
+    private $id;
+    /** @var int */
     private $person_id;
-    /** @var string */
+    /** @var string
     private $first_name;
-    /** @var string */
+    /** @var string
     private $last_name;
     /** @var DateTime */
     private $start_date;
     /** @var DateTime */
     private $end_date;
 
+
+    /**
+     * Create new {@link Unit} with default properties set.
+     */
+    public function __construct() {
+    }
+
     //~ Getters & setters
+
+    /**
+     * @return int
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    public function setId($id) {
+        $this->id = (int) $id;
+    }
 
     /**
      * @return int

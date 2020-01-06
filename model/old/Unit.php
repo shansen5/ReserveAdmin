@@ -3,7 +3,7 @@
 /**
  * Model class representing one unit.
  */
-final class Unit extends AbstractModel {
+final class Unit {
 
     private $unit_types = array( 1 => 'A - 2 bedroom upper unit',
         2 => 'A - 2 bedroom lower unit',
@@ -14,6 +14,8 @@ final class Unit extends AbstractModel {
         7 => 'E - 4 bedroom unit, living left',
         8 => 'Other' );
     
+    /** @var int */
+    private $id;
     /** @var string */
     private $address;
     /** @var string */
@@ -24,11 +26,29 @@ final class Unit extends AbstractModel {
     private $guest_limit;
 
 
+    /**
+     * Create new {@link Unit} with default properties set.
+     */
+    public function __construct() {
+    }
+
     public static function allUnitTypes() {
-        return self::unit_types;
+        $unit = new Unit();
+        return $unit->unit_types;
     }
 
     //~ Getters & setters
+
+    /**
+     * @return int
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    public function setId($id) {
+        $this->id = (int) $id;
+    }
 
     /**
      * @return string

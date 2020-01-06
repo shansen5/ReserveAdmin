@@ -5,9 +5,8 @@
  */
 final class Utils {
 
-    const USER = 1;
-    const MEALS_ADMIN = 2;
-    const ADMIN = 3;
+    const ADMIN = 1;
+    const USER = 2;
     
     const NUMBER_OF_UNITS = 33;
     
@@ -23,20 +22,6 @@ final class Utils {
         $params = array_merge(array('page' => $page), $params);
         // TODO add support for Apache's module rewrite
         return 'index.php?' .http_build_query($params);
-    }
-
-    /**
-     * Create DateTime from string of one of two formats 
-     * 'm-d-Y' or 'Y-m-d'
-     * @param string in one of the two formats
-     * @return DateTime
-     */
-    public static function createDateTimeFromString( $str ) {
-        $dt = DateTime::createFromFormat( 'm-d-Y', $str );
-        if ( ! $dt ) {
-            $dt = DateTime::createFromFormat( 'Y-m-d', $str );
-        }
-        return $dt;
     }
 
     /**
@@ -155,64 +140,6 @@ final class Utils {
     }
 
     /**
-     * Get {@link unit_id} of the Person idenfied
-     * @return unit_id {@link unit_id}
-     * @throws NotFoundException if the param or {@link unit_id} instance is not found
-     */
-    public static function getUnitIdByPersonId( $person_id ) {
-        $dao = new PersonDao();
-        $person = $dao->findById( $person_id );
-        if ( $person === null ) {
-            throw new NotFoundException( 'Unknown person id' );
-        }
-        $result = array( 'unit_id' => $person->getUnit(),
-                         'sub_unit' => $person->getSubUnit() );
-        return $result;
-    }
-
-    /**
-     * @return array of Persons with the same current unit_id
-     * @throws NotFoundException if the param or {@link Unit} instance is not found
-     */
-    public static function getUnitMembersByUnitId( $id = null ) {
-        $dao = new UnitPersonDao();
-        $search = new UnitPersonSearchCriteria();
-        $search->setSearchDate( new DateTime( 'now', 
-                                new DateTimeZone( 'America/Los_Angeles' )) );
-        $search->setOrderByName();
-        if ( $id ) {
-            $search->setUnitId( $id['unit_id'] );
-            $search->setSubUnit( $id['sub_unit'] );
-        }
-        $persons = $dao->find( $search );
-        return $persons;
-    }
-
-    /**
-     * @return array of MemberAttendees
-     * @throws NotFoundException if the param or {@link Unit} instance is not found
-     */
-    public static function getMemberAttendeesByMealId( $id ) {
-        $dao = new MemberAttendeeDao();
-        $search = new MemberAttendeeSearchCriteria();
-        $search->setMealId( $id );
-        $attendees = $dao->find( $search );
-        return $attendees;
-    }
-
-    /**
-     * @return array of Guests
-     * @throws NotFoundException if the param or {@link Unit} instance is not found
-     */
-    public static function getGuestsByMealId( $id ) {
-        $dao = new GuestDao();
-        $search = new GuestSearchCriteria();
-        $search->setMealId( $id );
-        $guests = $dao->find( $search );
-        return $guests;
-    }
-
-    /**
      * Get {@link Unit} by the identifier 'id' found in the URL.
      * @return Unit {@link Unit} instance
      * @throws NotFoundException if the param or {@link Unit} instance is not found
@@ -233,26 +160,6 @@ final class Utils {
             throw new NotFoundException('Unknown Unit identifier provided.');
         }
         return $unit;
-    }
-
-    /**
-     * Get {@link Meal} by the identifier 'id' found in the URL.
-     * @return Meal {@link Meal} instance
-     * @throws NotFoundException if the param or {@link Meal} instance is not found
-     */
-    public static function getMealByGetId() {
-        $id = null;
-        try {
-            $id = self::getUrlParam('meal_id');
-        } catch (Exception $ex) {
-            throw new NotFoundException('No Meal identifier provided.');
-        }
-        if (!is_numeric($id)) {
-            throw new NotFoundException('Invalid Meal identifier provided.');
-        }
-        $dao = new MealDao();
-        $meal = $dao->findById($id);
-        return $meal;
     }
 
     /**
@@ -281,9 +188,6 @@ final class Utils {
         if ( $_SESSION['oc_user_role'] == 'ADMIN' ) {
             return self::ADMIN;
         }
-        if ( $_SESSION['oc_user_role'] == 'MEALS_ADMIN' ) {
-            return self::MEALS_ADMIN;
-        }
         return self::USER;
     }
 
@@ -291,41 +195,42 @@ final class Utils {
         return $_SESSION['oc_user'];        
     }
     
-    public static function getCurrentAdultsAndIds() {
-        $search = new PersonSearchCriteria();
-        $now = new DateTime( 'now', new DateTimeZone( 'America/Los_Angeles' ));
-        $search->setSearchDate( $now );
-        $search->setExcludeOccupantType( 'child' );
-        $personDao = new PersonDao();
-        return $personDao->find( $search );
-    }
-
-    /**
-     * @return string of team lead names
-     */
-    public static function getMealTeamLeads( $id ) {
-        $dao = new MealTeamDao();
-        $team = $dao->findById( $id );
-        if ( $team ) {
-            $leads = $team->getLead1Name();
-            $lead2 = $team->getLead2Name();
-            if ( $lead2 ) {
-                $leads .= ', ' . $lead2;
-            }
-            return $leads;
+    public static function getUserIdByName() {
+        $dao = new UserDao();
+        $user = $dao->findByUsername($_SESSION['oc_user']);
+        if ($user) {
+            return $user->getId();
         }
-        return "";
-    }
-
-    /**
-     * @return array of id, lead1, lead2 for all meal teams
-     */
-    public static function getMealTeams() {
-        $dao = new MealTeamDao();
-        $result = $dao->find();
-        return $result;
+        throw new NotFoundException('User not found: ' . $_SESSION['oc_user']);
     }
     
+        /**
+     * Get {@link User} by the identifier 'id' found in the URL.
+     * @return User {@link User} instance
+     * @throws NotFoundException if the param or {@link User} instance is not found
+     */
+    public static function getUserByGetId() {
+        $id = null;
+        try {
+            $id = self::getUrlParam('id');
+        } catch (Exception $ex) {
+            throw new NotFoundException('No User identifier provided.');
+        }
+        if (!is_numeric($id)) {
+            throw new NotFoundException('Invalid User identifier provided.');
+        }
+        return Utils::getUserById( $id );
+    }
+
+    public static function getUserById( $id ) {
+        $dao = new UserDao();
+        $user = $dao->findById($id);
+        if ($user === null) {
+            throw new NotFoundException('Unknown User identifier provided.');
+        }
+        return $user;
+    }
+   
     /**
      * @return array of id, type, sub_type for all units
      */

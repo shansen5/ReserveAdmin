@@ -16,7 +16,6 @@ final class UnitPersonMapper {
      * <ul>
      *   <li>id</li>
      *   <li>unit_id</li>
-     *   <li>sub_unit</li>
      *   <li>person_id</li>
      *   <li>start_date</li>
      *   <li>end_date</li>
@@ -33,9 +32,6 @@ final class UnitPersonMapper {
         }
         if (array_key_exists('unit_id', $properties)) {
             $unit_person->setUnitId($properties['unit_id']);
-        }
-        if (array_key_exists('sub_unit', $properties)) {
-            $unit_person->setSubUnit($properties['sub_unit']);
         }
         if (array_key_exists('person_id', $properties)) {
             $unit_person->setPersonId($properties['person_id']);

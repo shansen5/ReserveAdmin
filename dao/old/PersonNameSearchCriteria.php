@@ -1,12 +1,12 @@
 <?php
-require_once( 'AbstractSearchCriteria.php' );
+
 
 /**
  * Search criteria for {@link PersonNameDao}.
  * <p>
  * Can be easily extended without changing the {@link PersonNameDao} API.
  */
-final class PersonNameSearchCriteria extends AbstractSearchCriteria {
+final class PersonNameSearchCriteria {
     private $search_date = null;
     private $person_id = null;
     private $first_name = null;

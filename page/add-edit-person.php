@@ -49,6 +49,7 @@ if (array_key_exists('cancel', $_POST)) {
     );
     $unit_data = array(
         'unit_id' => $_POST['person']['unit_id'],
+        'sub_unit' => $_POST['person']['sub_unit'],
         'start_date' => $_POST['person']['unit_start_date'],
         'occupant_type' => $_POST['person']['occupant_type']
     );

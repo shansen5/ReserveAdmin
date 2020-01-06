@@ -1,11 +1,12 @@
 <?php
 
-require_once( 'AbstractModel.php' );
 /**
  * Model class representing one user.
  */
-final class User extends AbstractModel {
+final class User {
 
+    /** @var int */
+    private $id;
     /** @var string */
     private $username;
     /** @var string */
@@ -21,6 +22,17 @@ final class User extends AbstractModel {
     }
 
     //~ Getters & setters
+
+    /**
+     * @return int <i>null</i> if not persistent
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    public function setId($id) {
+        $this->id = (int) $id;
+    }
 
     /**
      * @return string <i>null</i> if not persistent
@@ -54,5 +66,6 @@ final class User extends AbstractModel {
     public function setRole($role) {
         $this->role = $role;
     }
+
 
 }

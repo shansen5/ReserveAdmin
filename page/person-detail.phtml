@@ -18,7 +18,7 @@
     </tr>
     <tr>
         <th>Unit</th>
-        <td><?php echo Utils::escape($person->getUnit()); ?></td>
+        <td><?php echo Utils::escape($person->getUnit()) . $person->getSubUnit(); ?></td>
     </tr>
     <tr>
         <th>Email</th>

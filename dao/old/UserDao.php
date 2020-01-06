@@ -126,7 +126,7 @@ final class UserDao {
      * @return User
      * @throws Exception
      */
-    protected function insert(User $user) {
+    private function insert(User $user) {
         $user->setId( null );
 
         $sql = 'INSERT INTO users (id, username, password, role)
@@ -140,7 +140,7 @@ final class UserDao {
      * @return User
      * @throws Exception
      */
-    protected function update(User $user) {
+    private function update(User $user) {
         $sql = '
             UPDATE users SET
                 username = :username,

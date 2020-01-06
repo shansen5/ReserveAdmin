@@ -5,13 +5,29 @@
  * <p>
  * 
  */
-final class UnitPersonDao extends AbstractDao {
+final class UnitPersonDao {
+
+    /** @var PDO */
+    private $db = null;
+
+    /**
+     * 
+     * @param type $db PDO
+     */
+    public function __construct( $db = null ) {
+        $this->db = $db;
+    }
+
+    public function __destruct() {
+        // close db connection
+        $this->db = null;
+    }
 
     /**
      * Find all {@link Unit}s by search criteria.
      * @return array array of {@link Unit}s
      */
-    public function find( AbstractSearchCriteria $search = null ) {
+    public function find(UnitPersonSearchCriteria $search = null) {
         $result = array();
         $sql = $this->getFindSql($search);
         foreach ($this->query($sql) as $row) {
@@ -28,7 +44,7 @@ final class UnitPersonDao extends AbstractDao {
      */
     public function findById($id) {
         $row = $this->query(
-                'SELECT id, unit_id, sub_unit, person_id, start_date, end_date, type as occupant_type FROM person_units WHERE id = ' . (int) $id)->fetch();
+                'SELECT id, unit_id, person_id, start_date, end_date, type as occupant_type FROM person_units WHERE id = ' . (int) $id)->fetch();
         if (!$row) {
             return null;
         }
@@ -42,7 +58,7 @@ final class UnitPersonDao extends AbstractDao {
      * @param UnitPerson $unit_person {@link UnitPerson} to be saved
      * @return UnitPerson saved {@link UnitPerson} instance
      */
-    public function save( AbstractModel $unit_person ) {
+    public function save( $unit_person ) {
         if ( $unit_person->getId() === null ) {
             return $this->insert($unit_person);
         }
@@ -54,7 +70,7 @@ final class UnitPersonDao extends AbstractDao {
      * @param UnitPerson $unit_persons {@link UnitPerson} to be saved
      * @return UnitPerson saved {@link UnitPerson} instance
      */
-    public function saveAll( array $unit_persons ) {
+    public function saveAll( $unit_persons ) {
         foreach( $unit_persons as $unit_person ) {
             $this->save( $unit_person );
         }
@@ -77,6 +93,23 @@ final class UnitPersonDao extends AbstractDao {
         return $statement->rowCount() == 1;
     }
 
+    /**
+     * @return PDO
+     */
+    private function getDb() {
+        if ($this->db !== null) {
+            return $this->db;
+        }
+        $config = Config::getConfig("db");
+        try {
+            $this->db = new PDO($config['dsn'], $config['username'], $config['password'], 
+                    array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
+        } catch (Exception $ex) {
+            throw new Exception('DB connection error: ' . $ex->getMessage());
+        }
+        return $this->db;
+    }
+
     private function handleWhere( $sql, $where_started ) {
         if ( $where_started ) {
             $sql .= ' AND ';
@@ -85,9 +118,8 @@ final class UnitPersonDao extends AbstractDao {
         } 
         return $sql;
     }
-
-    protected function getFindSql( AbstractSearchCriteria $search = null ) {
-        $sql = 'SELECT pu.id as id, pu.unit_id as unit_id, pu.sub_unit as sub_unit, pu.person_id as person_id, '
+    private function getFindSql(UnitPersonSearchCriteria $search = null) {
+        $sql = 'SELECT pu.id as id, pu.unit_id as unit_id, pu.person_id as person_id, '
                 . 'pu.start_date as start_date, pu.end_date as end_date,'
                 . 'pu.type as occupant_type, pn.first_name as first_name, pn.last_name as last_name '
                 . ' FROM person_units pu JOIN person_names pn WHERE pn.person_id = pu.person_id ';
@@ -102,15 +134,11 @@ final class UnitPersonDao extends AbstractDao {
                 $sql .= ' AND ( pn.end_date is null OR pn.end_date >= ' . $search_date . ')';
             } else {
                 $sql = $this->handleWhere( $sql, $where_started );
-                $sql .= 'pn.end_date is null AND pu.end_date is null ';
+                $sql .= 'pn.end_date is null';
             }
             if ( $search->getUnitId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
                 $sql .= 'pu.unit_id = ' . $search->getUnitId();
-            }
-            if ( $search->getSubUnit() ) {
-                $sql = $this->handleWhere( $sql, $where_started );
-                $sql .= 'pu.sub_unit = ' . $search->getSubUnit();
             }
             if ( $search->getPersonId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );
@@ -120,14 +148,8 @@ final class UnitPersonDao extends AbstractDao {
                 $sql = $this->handleWhere( $sql, $where_started );
                 $sql .= 'pu.type = ' . "'" . $search->getOccupantType() . "'";
             }
-            if ( $search->getOrderByName() ) {
-                $sql .= ' ORDER BY pn.first_name';
-            } else {
-                $sql .= ' ORDER BY pu.start_date';
-            }
-        } else {
-            $sql .= ' ORDER BY pu.start_date';
         }
+        $sql .= ' ORDER BY pu.start_date';
         return $sql;
     }
 
@@ -135,10 +157,10 @@ final class UnitPersonDao extends AbstractDao {
      * @return Todo
      * @throws Exception
      */
-    protected function insert( AbstractModel $up ) {
+    public function insert(UnitPerson $up) {
         $up->setId( null );
-        $sql = 'INSERT INTO person_units (unit_id, sub_unit, person_id, start_date, end_date, type)
-                VALUES (:unit_id, :sub_unit, :person_id, :start_date, :end_date, :type)';
+        $sql = 'INSERT INTO person_units (unit_id, person_id, start_date, end_date, type)
+                VALUES (:unit_id, :person_id, :start_date, :end_date, :type)';
         $unit_person = $this->execute($sql, $up);
         $unit_person->setId( $this->getDb()->lastInsertId() ); 
         return $unit_person;
@@ -148,11 +170,10 @@ final class UnitPersonDao extends AbstractDao {
      * @return UnitPerson
      * @throws Exception
      */
-    protected function update( AbstractModel $unit_person ) {
+    private function update(UnitPerson $unit_person) {
         $sql = '
             UPDATE person_units SET
                 unit_id = :unit_id,
-                sub_unit = :sub_unit,
                 person_id = :person_id,
                 start_date = :start_date,
                 end_date = :end_date,
@@ -162,19 +183,54 @@ final class UnitPersonDao extends AbstractDao {
         return $this->execute($sql, $unit_person, true);
     }
 
-    protected function getParams( AbstractModel $unit_person, $update = false ) {
+    /**
+     * @return Unit
+     * @throws Exception
+     */
+    private function execute($sql, UnitPerson $unit_person, $update = false) {
+        $statement = $this->getDb()->prepare($sql);
+        $this->executeStatement($statement, $this->getParams($unit_person, $update));
+        if (!$statement->rowCount()) {
+            throw new NotFoundException('UnitPerson with ID "' . $unit_person->getId() . '" does not exist.');
+        }
+        return $unit_person;
+    }
+
+    private function getParams(UnitPerson $unit_person, $update) {
         $params = array(
             ':unit_id' => $unit_person->getUnitId(),
-            ':sub_unit' => $unit_person->getSubUnit(),
             ':person_id' => $unit_person->getPersonId(),
-            ':start_date' => $unit_person->getStartDate()->format( 'Y-m-d' ),
-            ':end_date' => $unit_person->getEndDate() ? $unit_person->getEndDate()->format( 'Y-m-d' ) : null,
+            ':start_date' => $unit_person->getStartDate()->format(DateTime::ISO8601),
+            ':end_date' => $unit_person->getEndDate() ? $unit_person->getEndDate()->format(DateTime::ISO8601) : null,
             ':type' => $unit_person->getOccupantType()
         );
         if ( $update ) {
             $params[':id'] = $unit_person->getId();
         }
         return $params;
+    }
+
+    private function executeStatement(PDOStatement $statement, array $params) {
+        if (!$statement->execute($params)) {
+            $errorInfo = $this->getDb()->errorInfo();
+            self::throwDbError( $errorInfo );
+        }
+    }
+
+    /**
+     * @return PDOStatement
+     */
+    private function query($sql) {
+        $statement = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
+        if ($statement === false) {
+            self::throwDbError($this->getDb()->errorInfo());
+        }
+        return $statement;
+    }
+
+    private static function throwDbError(array $errorInfo) {
+        // TODO log error, send email, etc.
+        throw new Exception('DB error [' . $errorInfo[0] . ', ' . $errorInfo[1] . ']: ' . $errorInfo[2]);
     }
 
 }

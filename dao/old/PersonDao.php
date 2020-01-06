@@ -1,11 +1,27 @@
 <?php
 
 /**
- * DAO for {@link Person}.
+ * DAO for {@link Unit}.
  * <p>
  * 
  */
-final class PersonDao extends AbstractDao {
+final class PersonDao {
+
+    /** @var PDO */
+    private $db = null;
+
+    /**
+     * 
+     * @param type $db PDO
+     */
+    public function __construct( $db = null ) {
+        $this->db = $db;
+    }
+
+    public function __destruct() {
+        // close db connection
+        $this->db = null;
+    }
 
     private function getNames( $id, $search = null ) {
         $pn_dao = new PersonNameDao();
@@ -40,10 +56,10 @@ final class PersonDao extends AbstractDao {
     }
     
     /**
-     * Find all {@link Person}s by search criteria.
-     * @return array array of {@link Person}s
+     * Find all {@link Unit}s by search criteria.
+     * @return array array of {@link Unit}s
      */
-    public function find( AbstractSearchCriteria $search = null ) {
+    public function find(PersonSearchCriteria $search = null) {
         $result = array();
         foreach ($this->query($this->getFindSql($search)) as $row) {
             $person = new Person();
@@ -52,7 +68,6 @@ final class PersonDao extends AbstractDao {
             $unit_persons = $this->getUnits( $person->getId(), $search );
             $person->setNames( $person_names );
             $person->setUnits( $unit_persons );
-            $person->setIsMealAdmin( $person->getId() );
             $person->setCurrentNameAndUnit();
             $result[$person->getId()] = $person;
         }
@@ -64,43 +79,39 @@ final class PersonDao extends AbstractDao {
      * @return Person or <i>null</i> if not found
      */
     public function findById($id) {
-        $sql = 'SELECT id, password, email, phone_land as phone1, '
-                    . 'phone_mobile as phone2, phone_work as phone3, '
-                    . ' birthdate as birthdate'
-                    . ' FROM people WHERE id = ' 
-                    . (int) $id;
-        $row = $this->query( $sql )->fetch();
+        $row = $this->query(
+                'SELECT id, password, email, phone_land as phone1, phone_mobile as phone2, phone_work as phone3, birthdate '
+                    . ' FROM people u WHERE id = ' . (int) $id)->fetch();
         if (!$row) {
             return null;
         }
         $person = new Person();
         PersonMapper::map($person, $row);
-        $person_names = $this->getNames( $id );
-        $unit_persons = $this->getUnits( $id );
+        $person_names = $this->getNames( $person->getId() );
+        $unit_persons = $this->getUnits( $person->getId() );
         $person->setNames( $person_names );
         $person->setUnits( $unit_persons );
         $person->setCurrentNameAndUnit();
-        $person->setIsMealAdmin( $this->isMealAdmin( $id ));
-
         return $person;
-    }
-
-    private function isMealAdmin( $person_id ) {
-        $row = $this->query(
-            'SELECT person_id from meal_admin WHERE person_id = ' . (int) $person_id 
-        ) -> fetch();
-        if ( $row ) {
-            return( true );
-        }
-        return false;
     }
 
     /**
      * Save {@link Person}.
-     * @param Person $person {@link Person} to be saved
-     * @return Person saved {@link Person} instance
+     * @param Unit $person {@link Unit} to be saved
+     * @return Unit saved {@link Unit} instance
      */
-    public function save(AbstractModel $person) {
+    public function save(Person $person) {
+        /*
+        $pn_dao = new PersonNameDao();
+        foreach( $person->getNames() as $person_name ) {
+            $pn_dao->save( $person_name );
+        }
+        $pu_dao = new UnitPersonDao();
+        foreach( $person->getUnits() as $unit ) {
+            $pu_dao->save( $unit );
+        }
+         * 
+         */
         if ($person->getId() === null) {
             return $this->insert($person);
         }
@@ -124,13 +135,29 @@ final class PersonDao extends AbstractDao {
         return $statement->rowCount() == 1;
     }
 
-    protected function getFindSql(AbstractSearchCriteria $search = null) {
+    /**
+     * @return PDO
+     */
+    private function getDb() {
+        if ($this->db !== null) {
+            return $this->db;
+        }
+        $config = Config::getConfig("db");
+        try {
+            $this->db = new PDO($config['dsn'], $config['username'], $config['password'], 
+                    array(PDO::MYSQL_ATTR_FOUND_ROWS => true));
+        } catch (Exception $ex) {
+            throw new Exception('DB connection error: ' . $ex->getMessage());
+        }
+        return $this->db;
+    }
+
+    private function getFindSql(PersonSearchCriteria $search = null) {
         $sql = 'SELECT p.id as id, p.password as password, p.email as email, '
-                . 'p.phone_land as phone1, p.phone_mobile as phone2, '
-                . 'p.phone_work as phone3, pn.first_name as first_name, '
-                . 'pn.last_name as last_name, pu.unit_id as unit_id, '
-                . 'pu.type as occupant_type, p.birthdate as birthdate '
-                . 'FROM people p JOIN person_names pn JOIN person_units pu '
+                . 'p.phone_land as phone1, p.phone_mobile as phone2, p.phone_work as phone3, p.birthdate, '
+                . ' pn.first_name as first_name, pn.last_name as last_name, pu.unit_id as unit_id,'
+                . ' pu.type as occupant_type'
+                . ' FROM people p JOIN person_names pn JOIN person_units pu '
                 . 'WHERE p.id = pn.person_id AND p.id = pu.person_id ';
         if ( $search && $search->hasFilter() ) {
             if ( $search->getSearchDate() ) {
@@ -150,31 +177,11 @@ final class PersonDao extends AbstractDao {
             if ( $search->getPersonId() ) {
                 $sql .= ' AND p.id = ' . $search->getPersonId();
             }
-            if ( $search->getPersonIdArray() ) {
-                $sql .= ' AND p.id in ( ';
-                $i = 1;
-                $num = count( $search->getPersonIdArray() );
-                foreach ( $search->getPersonIdArray() as $person ) {
-                    $sql .= $person;
-                    if ( $i < $num ) {
-                        $sql .= ', ';
-                        $i += 1;
-                    }
-                }
-                $sql .= ') ';
-            }
             if ( $search->getOccupantType() ) {
                 $sql .= ' AND pu.type = ' . "'" . $search->getOccupantType() . "'";
             }
-            if ( $search->getExcludeOccupantType() ) {
-                $sql .= ' AND pu.type <> ' . "'" . $search->getExcludeOccupantType() . "'";
-            }
-            if ( $search->getOrderByUnit() ) {
-                $sql .= ' ORDER BY unit_id, first_name';
-            } else {
-                $sql .= ' ORDER BY first_name';
-            }
         }
+        $sql .= ' ORDER BY first_name';
         return $sql;
     }
 
@@ -182,11 +189,11 @@ final class PersonDao extends AbstractDao {
      * @return Person
      * @throws Exception
      */
-    protected function insert( AbstractModel $person ) {
+    private function insert(Person $person) {
         $person->setId( null );
         $sql = '
-            INSERT INTO people (id, password, email, phone_land, phone_mobile, phone_work)
-                VALUES (:id, :password, :email, :phone1, :phone2, :phone3)';
+            INSERT INTO people (id, password, email, phone_land, phone_mobile, phone_work, birthdate )
+                VALUES (:id, :password, :email, :phone1, :phone2, :phone3, :birthdate)';
         return $this->execute($sql, $person);
     }
 
@@ -194,29 +201,67 @@ final class PersonDao extends AbstractDao {
      * @return Person
      * @throws Exception
      */
-    protected function update(AbstractModel $person) {
+    private function update(Person $person) {
         $sql = '
             UPDATE people SET
                 password = :password,
                 email = :email,
                 phone_land = :phone1,
                 phone_mobile = :phone2,
-                phone_work = :phone3
+                phone_work = :phone3,
+                birthdate = :birthdate
             WHERE
                 id = :id';
         return $this->execute($sql, $person);
     }
 
-    protected function getParams( AbstractModel $person, $update = false ) {
+    /**
+     * @return Person 
+     * @throws Exception
+     */
+    private function execute($sql, Person $person) {
+        $statement = $this->getDb()->prepare($sql);
+        $this->executeStatement($statement, $this->getParams($person));
+        if (!$person->getId()) {
+            return $this->findById($this->getDb()->lastInsertId());
+        }
+        return $person;
+    }
+
+    private function getParams(Person $person) {
         $params = array(
             ':id' => $person->getId(),
             ':password' => $person->getPassword(),
             ':email' => $person->getEmail(),
             ':phone1' => $person->getPhone1(),
             ':phone2' => $person->getPhone2(),
-            ':phone3' => $person->getPhone3()
+            ':phone3' => $person->getPhone3(),
+            ':birthdate' => $person->getBirthdate()
         );
         return $params;
+    }
+
+    private function executeStatement(PDOStatement $statement, array $params) {
+        if (!$statement->execute($params)) {
+            $errorInfo = $this->getDb()->errorInfo();
+            self::throwDbError( $errorInfo );
+        }
+    }
+
+    /**
+     * @return PDOStatement
+     */
+    private function query($sql) {
+        $statement = $this->getDb()->query($sql, PDO::FETCH_ASSOC);
+        if ($statement === false) {
+            self::throwDbError($this->getDb()->errorInfo());
+        }
+        return $statement;
+    }
+
+    private static function throwDbError(array $errorInfo) {
+        // TODO log error, send email, etc.
+        throw new Exception('DB error [' . $errorInfo[0] . ', ' . $errorInfo[1] . ']: ' . $errorInfo[2]);
     }
 
 }

@@ -6,10 +6,7 @@
  * <p>
  * Can be easily extended without changing the {@link UnitDao} API.
  */
-final class UnitSearchCriteria extends AbstractSearchCriteria {
+final class UnitSearchCriteria {
 
-    public function hasFilter() {
-        return false;
-    }
 
 }

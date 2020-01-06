@@ -20,6 +20,7 @@ final class PersonMapper {
      *   <li>phone_land</li>
      *   <li>phone_mobile</li>
      *   <li>phone_work</li>
+     *   <li>birthdate</li>
      * </ul>
      * @param Person $person
      * @param array $properties
@@ -34,9 +35,6 @@ final class PersonMapper {
         if (array_key_exists('email', $properties)) {
             $person->setEmail($properties['email']);
         }
-        if (array_key_exists('birthdate', $properties)) {
-            $person->setBirthdate($properties['birthdate']);
-        }
         if (array_key_exists('phone1', $properties)) {
             $person->setPhone1($properties['phone1']);
         }
@@ -45,6 +43,9 @@ final class PersonMapper {
         }
         if (array_key_exists('phone3', $properties)) {
             $person->setPhone3($properties['phone3']);
+        }
+        if (array_key_exists('birthdate', $properties)) {
+            $person->setBirthdate($properties['birthdate']);
         }
     }
 

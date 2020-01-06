@@ -3,8 +3,10 @@
 /**
  * Model class representing one person.
  */
-final class Person extends AbstractModel {
+final class Person {
    
+    /** @var int */
+    private $id;
     /** @var string */
     private $names = [];
     /** @var string */
@@ -13,21 +15,35 @@ final class Person extends AbstractModel {
     private $password;
     /** @var string */
     private $email;
-    /** @var Date */
-    private $birthdate;
     /** @var string */
     private $phone1;
     private $phone2;
     private $phone3;
-    private $isMealAdmin;
     /** Store the current name and unit*/
     private $first_name;
     private $last_name;
     private $unit;
-    private $sub_unit;
+    private $birthdate;
 
+
+    /**
+     * Create new {@link Item} with default properties set.
+     */
+    public function __construct() {
+    }
 
     //~ Getters & setters
+
+    /**
+     * @return int <i>null</i> if not persistent
+     */
+    public function getId() {
+        return $this->id;
+    }
+
+    public function setId($id) {
+        $this->id = (int) $id;
+    }
 
     /**
      * @return array
@@ -60,17 +76,6 @@ final class Person extends AbstractModel {
 
     public function setPassword($password) {
         $this->password = $password;
-    }
-
-    /**
-     * @return Date
-     */
-    public function getBirthdate() {
-        return $this->birthdate;
-    }
-
-    public function setBirthdate($birthdate) {
-        $this->birthdate = $birthdate;
     }
 
     /**
@@ -115,14 +120,14 @@ final class Person extends AbstractModel {
     }
     
     /**
-     * @return boolean
+     * @return DateTime <i>null</i> if not persistent
      */
-    public function getIsMealAdmin() {
-        return $this->isMealAdmin;
+    public function getBirthdate() {
+        return $this->birthdate;
     }
 
-    public function setIsMealAdmin( $sense ) {
-        $this->isMealAdmin = $sense;
+    public function setBirthdate($birthdate) {
+        $this->birthdate = $birthdate;
     }
     
     public function setCurrentNameAndUnit() {
@@ -132,34 +137,11 @@ final class Person extends AbstractModel {
                 $this->setLastName( $person_name->getLastName() );
             }
         }
-        $current_units = $this->getCurrentUnits();
-        if ( count( $current_units ) === 1 ) {
-            $this->setUnit( $current_units[0]->getUnitId() );
-            $this->setSubUnit( $current_units[0]->getSubUnit() );
-            return;
-        }
-        foreach( $current_units as $unit_person ) {
-            if ( $unit_person->getOccupantType() === 'owner' ) {
+        foreach( $this->units as $unit_person ) {
+            if ( $unit_person->getEndDate() === null ) {
                 $this->setUnit( $unit_person->getUnitId() );
-                $this->setSubUnit( $unit_person->getSubUnit() );
-                return;
             }
         }
-        foreach( $current_units as $unit_person ) {
-            if ( $unit_person->getOccupantType() === 'renter' ) {
-                $this->setUnit( $unit_person->getUnitId() );
-                $this->setSubUnit( $unit_person->getSubUnit() );
-                return;
-            }
-        }
-        foreach( $current_units as $unit_person ) {
-            if ( $unit_person->getOccupantType() === 'owner-non-occupant' ) {
-                $this->setUnit( $unit_person->getUnitId() );
-                $this->setSubUnit( $unit_person->getSubUnit() );
-                return;
-            }
-        }
-        return null;
     }
     
     public function addPersonName( $pn ) {
@@ -220,12 +202,5 @@ final class Person extends AbstractModel {
 
     public function setUnit($unit) {
         $this->unit = $unit;
-    }
-    public function getSubUnit() {
-        return $this->sub_unit;
-    }
-
-    public function setSubUnit($sub_unit) {
-        $this->sub_unit = $sub_unit;
     }
 }

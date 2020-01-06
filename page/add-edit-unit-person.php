@@ -33,6 +33,7 @@ if (array_key_exists('cancel', $_POST)) {
 } elseif (array_key_exists('save', $_POST)) {
     $unit_data = array(
         'unit_id' => $_POST['unit_person']['unit'],
+        'sub_unit' => $_POST['unit_person']['sub_unit'],
         'start_date' => $_POST['unit_person']['start_date'],
         'end_date' => $_POST['unit_person']['end_date'],
         'occupant_type' => $_POST['unit_person']['occupant_type']
