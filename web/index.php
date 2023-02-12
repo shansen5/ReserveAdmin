@@ -3,6 +3,9 @@
 /**
  * Main application class.
  */
+
+$BEGIN_DATE = DateTime::createFromFormat('Y-m-d', '1999-01-01');
+
 final class Index {
 
     const DEFAULT_PAGE = 'home';
@@ -166,7 +169,7 @@ if ( isset( $_POST[ 'username' ]) && isset( $_POST[ 'password' ])) {
         $index->run();  
     }
 } else 
-    if ( ! $_SESSION['oc_user'] ) : ?>
+    if ( ! array_key_exists('oc_user', $_SESSION )) : ?>
 <html>
 <head>
   <title>User Login</title>
@@ -174,7 +177,7 @@ if ( isset( $_POST[ 'username' ]) && isset( $_POST[ 'password' ])) {
 </head>
 <body>
   <form name="frmUser" method="post" action="index.php">
-    <div class="message"><?php if($message!="") { echo $message; } ?></div>
+    <div class="message"><?php if($message && $message!="") { echo $message; } ?></div>
     <table border="0" cellpadding="10" cellspacing="1" width="500" align="center">
       <tr class="tableheader">
         <td align="center" colspan="2">Enter Login Details</td>

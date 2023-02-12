@@ -47,7 +47,7 @@ final class Flash {
         if (!array_key_exists(self::FLASHES_KEY, $_SESSION)) {
             $_SESSION[self::FLASHES_KEY] = array();
         }
-        self::$flashes = &$_SESSION[self::FLASHES_KEY];
+        self::$flashes = $_SESSION[self::FLASHES_KEY];
     }
 
 }

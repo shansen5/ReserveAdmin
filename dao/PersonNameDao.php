@@ -91,11 +91,13 @@ final class PersonNameDao extends AbstractDao {
         if ( $search && $search->hasFilter() ) {
             $where_started = false;
             if ( $search->getSearchDate() ) {
-                $sql = $this->handleWhere( $sql, $where_started );
-                $where_started = true;
                 $search_date = "'" . $search->getSearchDate()->format('Y-m-d') . "'";
-                $sql .= ' start_date <= ' . $search_date;
-                $sql .= ' AND ( end_date is null OR end_date >= ' . $search_date . ')';
+                if ($search_date > $GLOBALS['BEGIN_DATE']) {
+                    $sql = $this->handleWhere( $sql, $where_started );
+                    $where_started = true;
+                    $sql .= ' start_date <= ' . $search_date;
+                    $sql .= ' AND ( end_date is null OR end_date >= ' . $search_date . ')';
+                }
             }
             if ( $search->getFirstName() ) {
                 $sql = $this->handleWhere( $sql, $where_started );

@@ -14,6 +14,8 @@ if ( isset( $_POST['show_date'] )) {
         $_POST['selected_date'] = $search_date->format('Y-m-d');
     } else if ( $show_date === 'Selected' ) {
         $search_date = new DateTime( $_POST['selected_date'] );
+    } else {
+        $search_date = $GLOBALS['BEGIN_DATE'];
     }
 } else {
         $search_date = new DateTime();

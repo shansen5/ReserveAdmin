@@ -7,7 +7,7 @@
  * Can be easily extended without changing the {@link PersonDao} API.
  */
 final class PersonSearchCriteria extends AbstractSearchCriteria {
-    private $search_date = null;
+    private $search_date;
     private $person_id = null;
     private $first_name = null;
     private $last_name = null;

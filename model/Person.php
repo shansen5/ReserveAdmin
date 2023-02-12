@@ -3,8 +3,10 @@
 /**
  * Model class representing one person.
  */
+
 final class Person extends AbstractModel {
-   
+ 
+
     /** @var string */
     private $names = [];
     /** @var string */
@@ -125,14 +127,17 @@ final class Person extends AbstractModel {
         $this->isMealAdmin = $sense;
     }
     
-    public function setCurrentNameAndUnit() {
+    public function setCurrentNameAndUnit( DateTime $search_date ) {
         foreach( $this->names as $person_name ) {
-            if ( $person_name->getEndDate() === null ) {
-                $this->setFirstName( $person_name->getFirstName() );
-                $this->setLastName( $person_name->getLastName() );
+            if ( $person_name->getEndDate() === null || $person_name->getEndDate() >= $search_date ) {
+                if ( $search_date <= $GLOBALS['BEGIN_DATE'] ||
+                        $person_name->getStartDate() <= $search_date ) {
+                    $this->setFirstName( $person_name->getFirstName() );
+                    $this->setLastName( $person_name->getLastName() );
+                }
             }
         }
-        $current_units = $this->getCurrentUnits();
+        $current_units = $this->getCurrentUnits( $search_date );
         if ( count( $current_units ) === 1 ) {
             $this->setUnit( $current_units[0]->getUnitId() );
             $this->setSubUnit( $current_units[0]->getSubUnit() );
@@ -183,10 +188,15 @@ final class Person extends AbstractModel {
      * @return array UnitPerson
      * The person may be own multiple units, or may own one and rent another, etc.
      */
-    public function getCurrentUnits() {
+    public function getCurrentUnits( DateTime $search_date ) {
         $units = array();
         foreach( $this->units as $unit_person ) {
-            if ( $unit_person->getEndDate() === null ) {
+            if ($search_date == $GLOBALS['BEGIN_DATE']) {
+                $units[] = $unit_person;
+                return $units; 
+            }
+            if (( $unit_person->getEndDate() === null || $unit_person->getEndDate() >= $search_date ) &&
+                    $unit_person->getStartDate() <= $search_date ) {
                 $units[] = $unit_person;
             }
         }

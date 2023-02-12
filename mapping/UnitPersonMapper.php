@@ -64,6 +64,9 @@ final class UnitPersonMapper {
     }
 
     private static function createDateTime($input) {
+        if (! $input) { 
+            return null;
+        }
         $d = DateTime::createFromFormat('Y-m-d', $input);
         return $d;
     }

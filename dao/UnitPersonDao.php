@@ -93,7 +93,7 @@ final class UnitPersonDao extends AbstractDao {
                 . ' FROM person_units pu JOIN person_names pn WHERE pn.person_id = pu.person_id ';
         if ( $search && $search->hasFilter() ) {
             $where_started = true;
-            if ( $search->getSearchDate() ) {
+            if ( $search->getSearchDate() > $GLOBALS['BEGIN_DATE'] ) {
                 $sql = $this->handleWhere( $sql, $where_started );
                 $search_date = "'" . $search->getSearchDate()->format('Y-m-d') . "'";
                 $sql .= 'pu.start_date <= ' . $search_date;
@@ -102,7 +102,7 @@ final class UnitPersonDao extends AbstractDao {
                 $sql .= ' AND ( pn.end_date is null OR pn.end_date >= ' . $search_date . ')';
             } else {
                 $sql = $this->handleWhere( $sql, $where_started );
-                $sql .= 'pn.end_date is null AND pu.end_date is null ';
+                $sql .= 'pn.end_date is null ';
             }
             if ( $search->getUnitId() ) {
                 $sql = $this->handleWhere( $sql, $where_started );

@@ -365,6 +365,9 @@ final class Utils {
      * @return string escaped string
      */
     public static function escape($string) {
+        if (! $string) {
+            return '';
+        }
         return htmlspecialchars($string, ENT_QUOTES);
     }
 

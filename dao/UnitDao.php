@@ -83,7 +83,7 @@ final class UnitDao extends AbstractDao {
     }
 
     /**
-     * @return Todo
+     * @return Unit
      * @throws Exception
      */
     protected function insert( AbstractModel $unit ) {

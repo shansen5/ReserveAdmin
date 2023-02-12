@@ -53,7 +53,7 @@ final class PersonDao extends AbstractDao {
             $person->setNames( $person_names );
             $person->setUnits( $unit_persons );
             $person->setIsMealAdmin( $person->getId() );
-            $person->setCurrentNameAndUnit();
+            $person->setCurrentNameAndUnit( $search->getSearchDate() );
             $result[$person->getId()] = $person;
         }
         return $result;
@@ -79,7 +79,7 @@ final class PersonDao extends AbstractDao {
         $unit_persons = $this->getUnits( $id );
         $person->setNames( $person_names );
         $person->setUnits( $unit_persons );
-        $person->setCurrentNameAndUnit();
+        $person->setCurrentNameAndUnit(new DateTime);
         $person->setIsMealAdmin( $this->isMealAdmin( $id ));
 
         return $person;
@@ -133,7 +133,7 @@ final class PersonDao extends AbstractDao {
                 . 'FROM people p JOIN person_names pn JOIN person_units pu '
                 . 'WHERE p.id = pn.person_id AND p.id = pu.person_id ';
         if ( $search && $search->hasFilter() ) {
-            if ( $search->getSearchDate() ) {
+            if ( $search->getSearchDate() > $GLOBALS['BEGIN_DATE'] ) {
                 $search_date = "'" . $search->getSearchDate()->format('Y-m-d') . "'";
                 $sql .= ' AND pu.start_date <= ' . $search_date;
                 $sql .= ' AND ( pu.end_date is null OR pu.end_date >= ' . $search_date;
