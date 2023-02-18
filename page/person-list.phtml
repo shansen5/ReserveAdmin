@@ -80,7 +80,17 @@
             </fieldset>
         </form>
     </div>
-
+    <div id="sidebar">
+        <form action="#" method="post">
+            <label>Count:  </label><?php echo sizeof( $persons ); ?>
+            <div class="wrapper">
+                <input type="hidden" name="selected_date" value="<?php echo $_POST['selected_date']; ?>">
+                <input type="hidden" name="download_date" value="<?php 
+                    echo array_key_exists('download_date', $_POST) ? $_POST['download_date'] : ''; 
+                    ?>">
+                <input type="submit" name="download_all" value="Download" class="submit-left" />
+            </div>
+    </div>
 </div>
 
 <table class="detail">
